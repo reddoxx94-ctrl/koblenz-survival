@@ -13,7 +13,7 @@
   ];
 
   KS.seilbahn = {
-    state: 'TAL', // 'TAL', 'TO_BERG', 'BERG', 'TO_TAL'
+    state: 'TAL',
     progress: 0,
     speed: 0.055,
     gondola: null,
@@ -34,22 +34,16 @@
       return m;
     };
 
-    // 1. Moderne Stationen (Talstation Konrad-Adenauer-Ufer & Bergstation Ehrenbreitstein)
     function makeStation(pos, rotY) {
       const st = new THREE.Group();
       st.position.copy(pos);
       st.rotation.y = rotY;
-      // Beton-Plattform & Einstiegsbereich
       add(st, new THREE.BoxGeometry(16, 0.6, 11), M.granite, 0, 0.3, 0);
-      // Tragpfeiler & verglaste Seitenwände
       add(st, new THREE.CylinderGeometry(0.45, 0.55, 6.2, 10), M.iron, -5.5, 3.1, 0);
       add(st, new THREE.CylinderGeometry(0.45, 0.55, 6.2, 10), M.iron, 5.5, 3.1, 0);
       add(st, new THREE.BoxGeometry(14, 4.2, 0.2), M.glass, 0, 2.7, 4.8);
       add(st, new THREE.BoxGeometry(14, 4.2, 0.2), M.glass, 0, 2.7, -4.8);
-      // Geschwungenes Umlenk-Dach mit gelbem Akzentstreifen
       add(st, new THREE.BoxGeometry(17, 0.9, 11.5), M.iron, 0, 6.4, 0);
-      add(st, new THREE.CylinderGeometry(5.75, 5.75, 0.9, 16), M.iron, -8.5, 6.4, 0);
-      add(st, new THREE.CylinderGeometry(4.2, 4.2, 0.35, 20), M.gold, -6.5, 5.7, 0);
       grp.add(st);
     }
 
@@ -57,46 +51,48 @@
     makeStation(KS.talPos, -angle);
     makeStation(KS.bergPos, -angle);
 
-    // 2. Große Fachwerk-Seilbahnstützen am Rhein- und Felsufer
-    function makePillar(x, baseY, topY, z) {
-      const h = topY - baseY;
-      const p = new THREE.Group();
-      p.position.set(x, baseY, z);
-      p.rotation.y = -angle;
-      // Betonsockel + konischer Stahlmast
-      add(p, new THREE.BoxGeometry(4.8, 2.8, 4.8), M.granite, 0, 1.4, 0);
-      add(p, new THREE.CylinderGeometry(0.85, 1.75, h, 8), pillarSteel, 0, h / 2, 0);
-      // Quertraverse (Joch) + Rollenbatterien
-      add(p, new THREE.BoxGeometry(1.6, 1.2, 9.6), M.iron, 0, h, 0);
-      add(p, new THREE.BoxGeometry(5.2, 0.55, 0.45), M.iron, 0, h - 0.5, 4.4);
-      add(p, new THREE.BoxGeometry(5.2, 0.55, 0.45), M.iron, 0, h - 0.5, -4.4);
-      add(p, new THREE.BoxGeometry(0.15, 1.6, 9.8), M.iron, 0, h + 1.1, 0);
-      grp.add(p);
-    }
-
-    makePillar(82, 1.2, 24.5, 35);
-    makePillar(240, 1.2, 88.5, -21);
-    makePillar(282, 102.0, 125.0, -37);
-
-    // 3. Dreiseil-System (2 Tragseile + 1 Zugseil je Fahrtrichtung)
     KS.seilbahn.curve = new THREE.CatmullRomCurve3(KS.cableWaypoints);
-    [-3.8, -3.4, 3.4, 3.8].forEach((offsetZ, idx) => {
-      const pts = KS.cableWaypoints.map((pt) => new THREE.Vector3(pt.x, pt.y - (idx % 2) * 0.25, pt.z + offsetZ * 0.35));
+    [-3.8, 3.8].forEach((offsetZ) => {
+      const pts = KS.cableWaypoints.map((pt) => new THREE.Vector3(pt.x, pt.y, pt.z + offsetZ));
       const cCurve = new THREE.CatmullRomCurve3(pts);
-      const cableGeo = new THREE.TubeGeometry(cCurve, 70, idx % 2 === 0 ? 0.07 : 0.045, 6, false);
+      const cableGeo = new THREE.TubeGeometry(cCurve, 70, 0.06, 6, false);
       grp.add(new THREE.Mesh(cableGeo, M.iron));
     });
 
-    // 4. Panorama-Gondel (Koblenzer 3S-Kabine mit Rundum-Verglasung)
     const gon = new THREE.Group();
-    // Laufwerk & Gehängearm oben am Seil
-    add(gon, new THREE.BoxGeometry(2.6, 0.45, 0.6), M.gold, 0, 0.2, 0);
-    add(gon, new THREE.CylinderGeometry(0.14, 0.14, 2.5, 8), M.iron, 0, -1.1, 0);
-    // Kabinendach, Glas-Korpus & Bodenwanne
     add(gon, new THREE.BoxGeometry(4.4, 0.35, 3.2), M.iron, 0, -2.2, 0);
     add(gon, new THREE.BoxGeometry(4.2, 2.35, 3.0), M.glass, 0, -3.55, 0);
-    add(gon, new THREE.BoxGeometry(4.4, 0.45, 3.2), M.iron, 0, -4.85, 0);
-    // Eckstreben & Holzsitzbänke im Inneren
-    [[-2.0, -1.4], [2.0, -1.4], [-2.0, 1.4], [2.0, 1.4]].forEach(([cx, cz]) => {
-      add(gon, new THREE.CylinderGeometry(0.08, 0.08, 2.4, 6), M.iron, cx, -3.55, cz);
-    });
+    gon.position.copy(KS.cableWaypoints[0]);
+    KS.seilbahn.gondola = gon;
+    grp.add(gon);
+
+    scene.add(grp);
+  };
+
+  KS.startSeilbahnRide = function (toBerg) {
+    KS.seilbahn.state = toBerg ? 'TO_BERG' : 'TO_TAL';
+    KS.seilbahn.progress = toBerg ? 0 : 1;
+  };
+
+  KS.updateSeilbahn = function (dt, player, camYaw) {
+    const sb = KS.seilbahn;
+    if (!sb.gondola || !sb.curve) return null;
+
+    if (sb.state === 'TO_BERG') {
+      sb.progress += dt * sb.speed;
+      if (sb.progress >= 1) { sb.progress = 1; sb.state = 'BERG'; }
+    } else if (sb.state === 'TO_TAL') {
+      sb.progress -= dt * sb.speed;
+      if (sb.progress <= 0) { sb.progress = 0; sb.state = 'TAL'; }
+    }
+
+    const pt = sb.curve.getPointAt(THREE.MathUtils.clamp(sb.progress, 0, 1));
+    sb.gondola.position.copy(pt);
+
+    if (sb.state === 'TO_BERG' || sb.state === 'TO_TAL') {
+      player.pos.set(pt.x, pt.y - 4.6, pt.z);
+      player.velY = 0;
+    }
+    return null;
+  };
+})();
