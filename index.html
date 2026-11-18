@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Koblenz Survival</title>
+  <title>Koblenz Survival 3D</title>
   <style>
     body {
       margin: 0;
       overflow: hidden;
       background-color: #000;
       font-family: sans-serif;
+      user-select: none;
     }
     #error-box {
       position: fixed;
@@ -23,15 +24,12 @@
       font-size: 13px;
       z-index: 9999;
       display: none;
-      max-height: 150px;
-      overflow-y: auto;
     }
   </style>
 </head>
 <body>
   <div id="error-box"></div>
 
-  <!-- Fehler-Abfänger für den Browser -->
   <script>
     window.onerror = function (msg, url, line) {
       var box = document.getElementById('error-box');
@@ -43,10 +41,10 @@
   <!-- Three.js Bibliothek -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-  <!-- Spiel-Module (Reihenfolge ist entscheidend!) -->
-  <script src="welt.js?v=200"></script>
-  <script src="seilbahn.js?v=200"></script>
-  <script src="festung.js?v=200"></script>
-  <script src="main.js?v=200"></script>
+  <!-- Spiel-Module in exakter Abfolge mit Versions-Query -->
+  <script src="welt.js?v=500"></script>
+  <script src="seilbahn.js?v=500"></script>
+  <script src="festung.js?v=500"></script>
+  <script src="main.js?v=500"></script>
 </body>
 </html>
