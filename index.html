@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Koblenz Survival – Deutsches Eck & Ehrenbreitstein</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    html, body { margin: 0; padding: 0; overflow: hidden; background: #0f172a; touch-action: none; user-select: none; }
+    canvas { display: block; }
+  </style>
+</head>
+<body class="text-white font-sans">
+
+  <!-- HUD Oben -->
+  <div class="fixed top-3 left-3 right-3 z-20 flex justify-between items-start pointer-events-none">
+    <div class="bg-slate-900/75 backdrop-blur px-3 py-2 rounded-xl border border-amber-400/40">
+      <div id="zone-txt" class="text-xs font-bold text-amber-300">📍 Koblenz Deutsches Eck</div>
+      <div id="status-txt" class="text-[11px] text-slate-300">Seilbahn bereit</div>
+    </div>
+    <div class="flex gap-2 pointer-events-auto">
+      <button id="btn-weather" class="bg-slate-900/80 border border-slate-600 px-3 py-2 rounded-xl text-xs font-bold active:scale-95">☀️ Wetter</button>
+      <button id="btn-tp-tal" class="bg-cyan-600/80 border border-cyan-300 px-3 py-2 rounded-xl text-xs font-bold active:scale-95">🚡 Zur Seilbahn</button>
+    </div>
+  </div>
+
+  <!-- Interaktions-Hinweis -->
+  <div id="interact-wrap" class="hidden fixed bottom-28 left-1/2 -translate-x-1/2 z-20">
+    <button id="btn-interact" class="bg-amber-500 text-slate-950 font-bold px-5 py-2.5 rounded-2xl shadow-lg text-sm active:scale-95">
+      [E] Interagieren
+    </button>
+  </div>
+
+  <!-- Toast-Meldung -->
+  <div id="toast" class="hidden fixed top-16 left-1/2 -translate-x-1/2 z-30 bg-slate-900/90 border border-amber-400/50 px-4 py-2 rounded-xl text-xs font-semibold text-amber-200 text-center"></div>
+
+  <!-- Mobile Touch-Steuerung (Joystick links) -->
+  <div id="joy-zone" class="fixed bottom-5 left-5 w-32 h-32 rounded-full bg-slate-900/40 border border-white/20 z-20 flex items-center justify-center">
+    <div id="joy-knob" class="w-12 h-12 rounded-full bg-amber-400/80 shadow-lg pointer-events-none"></div>
+  </div>
+
+  <!-- Sprung-Button rechts -->
+  <button id="btn-jump" class="fixed bottom-8 right-6 z-20 w-16 h-16 rounded-full bg-slate-900/70 border border-amber-400/60 text-xs font-bold active:scale-95">
+    ⬆️
+  </button>
+
+  <!-- Modulare Spiel-Skripte -->
+  <script src="welt.js"></script>
+  <script src="seilbahn.js"></script>
+  <script src="festung.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
