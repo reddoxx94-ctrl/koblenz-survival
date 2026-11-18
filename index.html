@@ -13,6 +13,16 @@
 </head>
 <body class="text-white font-sans">
 
+  <!-- Fehleranzeige für Smartphone-Tests -->
+  <div id="err-box" class="hidden fixed inset-x-3 top-20 z-50 bg-red-900/95 border border-red-400 p-3 rounded-xl text-xs font-mono text-white"></div>
+  <script>
+    window.onerror = function (msg, url, line) {
+      const b = document.getElementById('err-box');
+      b.classList.remove('hidden');
+      b.textContent = 'FEHLER: ' + msg + ' (Zeile ' + line + ' in ' + (url || '').split('/').pop() + ')';
+    };
+  </script>
+
   <!-- HUD Oben -->
   <div class="fixed top-3 left-3 right-3 z-20 flex justify-between items-start pointer-events-none">
     <div class="bg-slate-900/75 backdrop-blur px-3 py-2 rounded-xl border border-amber-400/40">
@@ -45,10 +55,10 @@
     ⬆️
   </button>
 
-  <!-- Modulare Spiel-Skripte -->
-  <script src="welt.js"></script>
-  <script src="seilbahn.js"></script>
-  <script src="festung.js"></script>
-  <script src="main.js"></script>
+  <!-- Modulare Spiel-Skripte (mit Cache-Buster) -->
+  <script src="welt.js?v=4"></script>
+  <script src="seilbahn.js?v=4"></script>
+  <script src="festung.js?v=4"></script>
+  <script src="main.js?v=4"></script>
 </body>
 </html>
