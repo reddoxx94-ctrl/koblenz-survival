@@ -111,6 +111,6 @@ KS.mats = {
   basalt: new THREE.MeshStandardMaterial({ color: 0x283240, roughness: 0.9 }),
   wood: new THREE.MeshStandardMaterial({ color: 0x653b1c, roughness: 0.85 }),
   roof: new THREE.MeshStandardMaterial({ color: 0x7a211e, roughness: 0.82 }),
-  iron: new THREE.MeshStandardMaterial({ color: 0x1a2230, metalness: 0.75, roughness: 0.
+  iron: new THREE.MeshStandardMaterial({ color: 0x1a2230, metalness: 0.75, roughness: 0.};
     
                                                          
