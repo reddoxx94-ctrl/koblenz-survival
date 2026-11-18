@@ -1,53 +1,39 @@
-window.KS = window.KS || {};
+(function () {
+  window.KS = window.KS || {};
 
-KS.buildFestung = function (scene) {
-  const grp = new THREE.Group();
-  const PL = 118.0; // Plateau-Höhe (183 m NHN)
+  KS.buildFestung = function (scene) {
+    const grp = new THREE.Group();
+    const M = KS.mats;
+    const Y = 118.0; // Plateau-Höhe Ehrenbreitstein
 
-  const addBox = (w, h, d, x, y, z, mat) => {
-    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
-    m.position.set(x, y, z);
-    grp.add(m);
-    return m;
-  };
+    const add = (geo, mat, x, y, z, rx = 0, ry = 0, rz = 0) => {
+      const m = new THREE.Mesh(geo, mat);
+      m.position.set(x, y, z);
+      m.rotation.set(rx, ry, rz);
+      m.castShadow = true;
+      m.receiveShadow = true;
+      grp.add(m);
+      return m;
+    };
 
-  // Festungs-Plateau & Großer Schlosshof
-  addBox(125, 1.0, 105, 360, PL - 0.5, -55, KS.mats.tuff);
+    // 1. Großes Festungs-Plateau (Oberer Schlosshof & BUGA-Vorfeld)
+    add(new THREE.BoxGeometry(135, 3.0, 125), M.paving, 360, Y - 1.5, -50);
+    add(new THREE.BoxGeometry(75, 0.2, 85), M.grass, 395, Y + 0.05, -50);
 
-  // Aussichtsbauwerk Rheinblick (direkt neben der Bergstation)
-  addBox(14, 0.4, 12, 307, PL + 0.2, -26, KS.mats.wood);
-  addBox(0.4, 1.2, 12, 300.2, PL + 0.8, -26, KS.mats.iron); // Brüstung West
+    // 2. Rhein-Bastion & Festungsmauer (Kurtine mit Kasematten-Fenstern)
+    add(new THREE.BoxGeometry(8.5, 16, 118), M.granite, 298, Y + 6.5, -50);
+    // Zinnen / Brustwehr zur Rheinseite
+    for (let z = -104; z <= 4; z += 9) {
+      add(new THREE.BoxGeometry(2.2, 2.2, 5.2), M.granite, 294.5, Y + 15.2, z);
+      // Dunkle Kasematten-Schießscharten in der Mauer
+      add(new THREE.BoxGeometry(1.2, 2.6, 1.8), M.darkPortal, 293.7, Y + 9.0, z);
+      add(new THREE.BoxGeometry(1.2, 2.2, 1.5), M.darkPortal, 293.7, Y + 3.5, z);
+    }
 
-  // Feldtor-Mauer (Eingang zum Schlosshof)
-  addBox(14, 6.5, 2.5, 339, PL + 3.25, -35, KS.mats.ochre);
-  addBox(14, 6.5, 2.5, 358, PL + 3.25, -35, KS.mats.ochre);
-  addBox(5, 2.2, 2.6, 348.5, PL + 5.4, -35, KS.mats.tuff); // Torsturz
+    // 3. Markanter Rundturm (Ungenturm / Süd-Bastion am Sporn)
+    add(new THREE.CylinderGeometry(8.5, 9.8, 22, 18), M.granite, 296, Y + 9.0, 12);
+    add(new THREE.CylinderGeometry(9.2, 9.2, 1.8, 18), M.tuff, 296, Y + 20.5, 12);
+    add(new THREE.ConeGeometry(8.8, 6.5, 18), M.slate, 296, Y + 24.5, 12);
 
-  // Rheinkaserne (Westflügel über dem Rhein)
-  addBox(22, 9.5, 42, 350, PL + 4.75, -75, KS.mats.ochre);
-  addBox(23, 0.8, 43, 350, PL + 9.8, -75, KS.mats.tuff); // Gesims
-
-  // Hohe Ostfront & Nordabschluss des Schlosshofs
-  addBox(20, 11.5, 46, 407, PL + 5.75, -75, KS.mats.ochre);
-  addBox(78, 12.0, 8, 378, PL + 6.0, -100, KS.mats.ochre);
-
-  // Zwei historische Kanonen am Rheinblick
-  [-39, -16].forEach((cz) => {
-    addBox(1.8, 0.7, 1.0, 309, PL + 0.35, cz, KS.mats.wood);
-    const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.25, 2.6, 10), KS.mats.bronze);
-    barrel.rotation.z = Math.PI / 2;
-    barrel.position.set(308.2, PL + 0.85, cz);
-    grp.add(barrel);
-  });
-
-  // Fahnenmasten auf der Rheinkaserne
-  [-90, -60].forEach((fz) => {
-    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.12, 6.5, 8), KS.mats.iron);
-    pole.position.set(341, PL + 13.0, fz);
-    const flag = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1.4, 2.4), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
-    flag.position.set(341, PL + 15.2, fz + 1.2);
-    grp.add(pole, flag);
-  });
-
-  scene.add(grp);
-};
+    // Nord-Bastion (Fuchs-Bastion)
+    add(new THREE.CylinderGeometry(9.0, 10.5, 18, 12), M.granite, 2
