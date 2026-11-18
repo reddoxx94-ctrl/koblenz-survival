@@ -76,5 +76,68 @@ KS.mats = {
   bronze: new THREE.MeshStandardMaterial({ color: 0x24362e, metalness: 0.72, roughness: 0.35 }),
   bronzePatina: new THREE.MeshStandardMaterial({ color: 0x3d5e51, metalness: 0.55, roughness: 0.42 }),
   gold: new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.85, roughness: 0.25 }),
-  wood: new THREE.MeshStandardMaterial({ color: 0x653b1c, roughness: 0.8
-                                        
+  wood: new THREE.MeshStandardMaterial({ color: 0x653b1c, roughness: 0.85 }),
+  roof: new THREE.MeshStandardMaterial({ color: 0x7c221e, roughness: 0.82 }),
+  iron: new THREE.MeshStandardMaterial({ color: 0x1a2230, metalness: 0.75, roughness: 0.38 }),
+  darkPortal: new THREE.MeshStandardMaterial({ color: 0x0b0f14, roughness: 0.95 }),
+  lampGlow: new THREE.MeshStandardMaterial({ color: 0xfef3c7, emissive: 0xf59e0b, emissiveIntensity: 0.7 }),
+  white: new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.45 }),
+  glass: new THREE.MeshStandardMaterial({ color: 0x0f172a, transparent: true, opacity: 0.35, metalness: 0.6, roughness: 0.1, side: THREE.DoubleSide })
+};
+
+// 3. Terrain-Höhenberechnung (inkl. Treppen & Ehrenbreitstein)
+KS.getTerrainHeight = function (x, z) {
+  if (x >= 195) {
+    if (x >= 295 && x <= 430 && z >= -110 && z <= 10) return 118.0;
+    if (x > 210 && x < 295) {
+      const t = THREE.MathUtils.clamp((x - 210) / 85, 0, 1);
+      return t * t * (3 - 2 * t) * 118.0;
+    }
+    return 1.2;
+  }
+  if (Math.abs(x) <= 16 && z >= -10 && z <= 25) {
+    if (Math.abs(x) <= 8.5 && z >= -8 && z <= 8.5) return 6.4;
+    if (z > 8.5 && z <= 24) return 1.2 + THREE.MathUtils.clamp((24 - z) / 15.5, 0, 1) * 5.2;
+  }
+  return 1.2;
+};
+
+// 4. Hauptwelt-Aufbau (Etappe 1: Flüsse, Deutsches Eck & Ehrenbreitstein-Fels)
+KS.buildWorld = function (scene) {
+  const grp = new THREE.Group();
+  const add = (geo, mat, x, y, z, rx = 0, ry = 0, rz = 0) => {
+    const m = new THREE.Mesh(geo, mat);
+    m.position.set(x, y, z); m.rotation.set(rx, ry, rz);
+    m.castShadow = true; m.receiveShadow = true;
+    grp.add(m); return m;
+  };
+
+  // Rhein & Mosel
+  add(new THREE.PlaneGeometry(260, 760), KS.mats.water, 145, 0, 0, -Math.PI / 2);
+  add(new THREE.PlaneGeometry(340, 340), KS.mats.water, -140, 0.02, -160, -Math.PI / 2);
+
+  // Landzunge Deutsches Eck (Schiffsbug-Form) mit Basalt-Ufermauer
+  const eck = new THREE.Shape();
+  eck.moveTo(-120, 200); eck.lineTo(80, 200); eck.lineTo(76, 20);
+  eck.lineTo(0, -72); eck.lineTo(-96, 25); eck.closePath();
+  const eckGeo = new THREE.ExtrudeGeometry(eck, { depth: 1.4, bevelEnabled: true, bevelThickness: 0.15, bevelSize: 0.2 });
+  eckGeo.rotateX(Math.PI / 2);
+  add(eckGeo, KS.mats.paving, 0, 1.2, 0);
+
+  // Uferwiesen (Kastorgarten & Konrad-Adenauer-Ufer)
+  add(new THREE.BoxGeometry(52, 0.16, 72), KS.mats.grass, -46, 1.22, 66);
+  add(new THREE.BoxGeometry(36, 0.16, 68), KS.mats.grass, 38, 1.22, 108);
+
+  // Ostufer & gestuftes Schiefermassiv Ehrenbreitstein
+  add(new THREE.BoxGeometry(85, 2.4, 320), KS.mats.grass, 225, 0, 0);
+  add(new THREE.CylinderGeometry(72, 112, 118, 14), KS.mats.slate, 355, 59, -55);
+  add(new THREE.CylinderGeometry(46, 80, 96, 12), KS.mats.slate, 325, 48, -115);
+  add(new THREE.CylinderGeometry(48, 82, 88, 12), KS.mats.slate, 330, 44, 20);
+
+  // Platzhalter für Etappe 2–4
+  if (KS.addMonument) KS.addMonument(grp, add);
+  if (KS.addLandmarks) KS.addLandmarks(grp, add);
+  if (KS.addOldTown) KS.addOldTown(grp, add);
+
+  scene.add(grp);
+};
