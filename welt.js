@@ -19,7 +19,10 @@
           const off = (y / 16) % 2 === 0 ? 0 : 8;
           for (let x = 0; x < 256; x += 16) {
             const v = 64 + Math.floor(Math.random() * 32);
-            ctx.fillStyle = `rgb(${v},${v + 3},${v + 7})`; ctx.fillRect((x + off) \% 256 + 1, y + 1, 14, 14); const bv = 155 + Math.floor(Math.random() * 70); btx.fillStyle = `rgb(${bv},${bv},${bv})`;
+            ctx.fillStyle = `rgb(${v},${v + 3},${v + 7})`;
+            ctx.fillRect((x + off) % 256 + 1, y + 1, 14, 14);
+            const bv = 155 + Math.floor(Math.random() * 70);
+            btx.fillStyle = `rgb(${bv},${bv},${bv})`;
             btx.fillRect((x + off) % 256 + 1, y + 1, 14, 14);
           }
         }
@@ -32,4 +35,42 @@
           const off = (y / 32) % 2 === 0 ? 0 : 32;
           for (let x = 0; x < 256; x += 64) {
             const v = 122 + Math.floor(Math.random() * 28);
-            ctx.fillStyle = `rgb
+            ctx.fillStyle = `rgb(${v + 8},${v + 2},${v - 7})`;
+            ctx.fillRect((x + off) % 256 + 2, y + 2, 60, 28);
+            btx.fillStyle = '#d4d4d4';
+            btx.fillRect((x + off) % 256 + 2, y + 2, 60, 28);
+          }
+        }
+      }
+      const map = new THREE.CanvasTexture(c);
+      const bump = new THREE.CanvasTexture(b);
+      map.wrapS = map.wrapT = bump.wrapS = bump.wrapT = THREE.RepeatWrapping;
+      map.repeat.set(repX, repY);
+      bump.repeat.set(repX, repY);
+      return { map, bump };
+    } catch (e) {
+      return { map: null, bump: null };
+    }
+  }
+
+  const pavingTex = makeTexSet('paving', 0.14, 0.14);
+  const graniteTex = makeTexSet('granite', 2, 2);
+
+  KS.mats = {
+    granite: new THREE.MeshStandardMaterial({ map: graniteTex.map, bumpMap: graniteTex.bump, bumpScale: 0.22, color: 0xffffff, roughness: 0.88 }),
+    paving: new THREE.MeshStandardMaterial({ map: pavingTex.map, bumpMap: pavingTex.bump, bumpScale: 0.18, color: 0xb8c0cc, roughness: 0.88 }),
+    stone: new THREE.MeshStandardMaterial({ color: 0x7b7870, roughness: 0.9 }),
+    bronze: new THREE.MeshStandardMaterial({ color: 0x24362e, metalness: 0.72, roughness: 0.36 }),
+    white: new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.45 }),
+    glass: new THREE.MeshStandardMaterial({ color: 0x0f172a, transparent: true, opacity: 0.35, side: THREE.DoubleSide })
+  };
+
+  KS.getTerrainHeight = function (x, z) { return 1.2; };
+
+  KS.buildWorld = function (scene) {
+    const grp = new THREE.Group();
+    const floor = new THREE.Mesh(new THREE.BoxGeometry(100, 1, 100), KS.mats.paving);
+    grp.add(floor);
+    scene.add(grp);
+  };
+})();
