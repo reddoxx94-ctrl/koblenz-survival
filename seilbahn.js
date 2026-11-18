@@ -23,7 +23,6 @@
   KS.buildSeilbahn = function (scene) {
     const grp = new THREE.Group();
     const M = KS.mats;
-    const pillarSteel = new THREE.MeshStandardMaterial({ color: 0x2f4f3e, metalness: 0.65, roughness: 0.38 });
 
     const add = (parent, geo, mat, x, y, z, rx = 0, ry = 0, rz = 0) => {
       const m = new THREE.Mesh(geo, mat);
@@ -39,11 +38,7 @@
       st.position.copy(pos);
       st.rotation.y = rotY;
       add(st, new THREE.BoxGeometry(16, 0.6, 11), M.granite, 0, 0.3, 0);
-      add(st, new THREE.CylinderGeometry(0.45, 0.55, 6.2, 10), M.iron, -5.5, 3.1, 0);
-      add(st, new THREE.CylinderGeometry(0.45, 0.55, 6.2, 10), M.iron, 5.5, 3.1, 0);
       add(st, new THREE.BoxGeometry(14, 4.2, 0.2), M.glass, 0, 2.7, 4.8);
-      add(st, new THREE.BoxGeometry(14, 4.2, 0.2), M.glass, 0, 2.7, -4.8);
-      add(st, new THREE.BoxGeometry(17, 0.9, 11.5), M.iron, 0, 6.4, 0);
       grp.add(st);
     }
 
@@ -74,9 +69,9 @@
     KS.seilbahn.progress = toBerg ? 0 : 1;
   };
 
-  KS.updateSeilbahn = function (dt, player, camYaw) {
+  KS.updateSeilbahn = function (dt, player) {
     const sb = KS.seilbahn;
-    if (!sb.gondola || !sb.curve) return null;
+    if (!sb.gondola || !sb.curve) return;
 
     if (sb.state === 'TO_BERG') {
       sb.progress += dt * sb.speed;
@@ -93,6 +88,5 @@
       player.pos.set(pt.x, pt.y - 4.6, pt.z);
       player.velY = 0;
     }
-    return null;
   };
 })();
